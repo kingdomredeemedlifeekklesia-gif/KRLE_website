@@ -15,14 +15,24 @@ export async function getYouTubeVideos(limit: number = 10): Promise<YouTubeVideo
     return [];
   }
 
+  const fetchOptions: any = typeof window === "undefined" ? { next: { revalidate: 60 } } : {};
+
   try {
     const response = await fetch(
       `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${YOUTUBE_CHANNEL_ID}&order=date&maxResults=${limit}&type=video&key=${YOUTUBE_API_KEY}`,
-      { next: { revalidate: 60 } }
+      fetchOptions
     );
     const data = await response.json();
 
-    if (!data.items) return [];
+    if (!response.ok) {
+      console.error("YouTube API error:", data);
+      return [];
+    }
+
+    if (!data.items) {
+      console.error("YouTube API returned no items", data);
+      return [];
+    }
 
     return data.items.map((item: any) => ({
       id: item.id.videoId,
@@ -43,10 +53,12 @@ export async function getRecentLiveStream(): Promise<YouTubeVideo | null> {
     return null;
   }
 
+  const fetchOptions: any = typeof window === "undefined" ? { next: { revalidate: 60 } } : {};
+
   try {
     const response = await fetch(
       `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${YOUTUBE_CHANNEL_ID}&eventType=live&type=video&key=${YOUTUBE_API_KEY}`,
-      { next: { revalidate: 60 } }
+      fetchOptions
     );
     const data = await response.json();
 

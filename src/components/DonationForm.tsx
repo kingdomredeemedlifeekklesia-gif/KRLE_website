@@ -34,8 +34,6 @@ const DonationForm = () => {
     return digits;
   };
 
-  const getApiUrl = (path: string) => `${window.location.origin}${path}`;
-
   const loadPaystackScript = () => {
     if (typeof window === "undefined") return;
 
@@ -45,8 +43,16 @@ const DonationForm = () => {
       return;
     }
 
-    const existingScript = document.querySelector('script[src="https://js.paystack.co/v1/inline.js"]');
+    const existingScript = document.querySelector('script[src="https://js.paystack.co/v1/inline.js"]') as HTMLScriptElement | null;
     if (existingScript) {
+      if (existingScript.readyState === "complete" || existingScript.readyState === "loaded") {
+        if ((window as any).PaystackPop) {
+          setPaystackLoaded(true);
+          setPaystackLoading(false);
+          return;
+        }
+      }
+
       existingScript.addEventListener("load", () => {
         setPaystackLoaded(true);
         setPaystackLoading(false);
@@ -64,6 +70,7 @@ const DonationForm = () => {
     script.onload = () => {
       setPaystackLoaded(true);
       setPaystackLoading(false);
+      script.setAttribute("data-loaded", "true");
     };
     script.onerror = () => {
       setPaystackLoaded(false);
