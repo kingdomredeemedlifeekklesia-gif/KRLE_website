@@ -1,5 +1,5 @@
 export default {
   datasource: {
-    url: 'file:dev.db',
+    url: process.env.DATABASE_URL,
   },
 } as const;

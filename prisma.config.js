@@ -1,5 +1,5 @@
 module.exports = {
   datasource: {
-    url: 'file:dev.db',
+    url: process.env.DATABASE_URL,
   },
 };
