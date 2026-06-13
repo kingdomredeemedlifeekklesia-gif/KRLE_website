@@ -1,4 +1,5 @@
-﻿import { PrismaClient } from "@prisma/client";
+﻿import path from "node:path";
+import { PrismaClient } from "@prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 
 declare global {
@@ -6,10 +7,13 @@ declare global {
   var prisma: PrismaClient | undefined;
 }
 
+const databaseUrl = process.env.DATABASE_URL || `file:${path.join(process.cwd(), "dev.db")}`;
+const sqliteUrl = databaseUrl.startsWith("file:") ? databaseUrl : `file:${databaseUrl}`;
+
 const prismaClientSingleton = () => {
   return new PrismaClient({
     adapter: new PrismaBetterSqlite3({
-      url: process.env.DATABASE_URL ?? "file:dev.db",
+      url: sqliteUrl,
     }),
   });
 };
