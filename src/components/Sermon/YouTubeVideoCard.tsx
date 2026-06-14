@@ -8,8 +8,6 @@ interface YouTubeVideoCardProps {
 }
 
 export default function YouTubeVideoCard({ id, title, thumbnail, publishedAt }: YouTubeVideoCardProps) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // @ts-expect-error - Date is available at runtime
   const date = (new (globalThis as any).Date(publishedAt) as any).toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
