@@ -8,7 +8,7 @@ interface YouTubeVideoCardProps {
 }
 
 export default function YouTubeVideoCard({ id, title, thumbnail, publishedAt }: YouTubeVideoCardProps) {
-  const date = new Date(publishedAt).toLocaleDateString("en-US", {
+  const date = (new (globalThis as any).Date(publishedAt) as any).toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
