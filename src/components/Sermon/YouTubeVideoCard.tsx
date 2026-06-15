@@ -1,7 +1,7 @@
 "use client";
 
 interface YouTubeVideoCardProps {
-  id: string;
+  id: string | number;
   title: string;
   thumbnail: string;
   publishedAt: string;
@@ -23,7 +23,7 @@ export default function YouTubeVideoCard({ id, title, thumbnail, publishedAt }: 
           className="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-300"
         />
         <a
-          href={`https://www.youtube.com/watch?v=${id}`}
+          href={`https://www.youtube.com/watch?v=${String(id)}`}
           target="_blank"
           rel="noopener noreferrer"
           className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity"
@@ -36,7 +36,7 @@ export default function YouTubeVideoCard({ id, title, thumbnail, publishedAt }: 
         </a>
       </div>
       <div className="p-4">
-        <a href={`https://www.youtube.com/watch?v=${id}`} target="_blank" rel="noopener noreferrer">
+        <a href={`https://www.youtube.com/watch?v=${String(id)}`} target="_blank" rel="noopener noreferrer">
           <h3 className="mb-2 line-clamp-2 text-base font-semibold text-black hover:text-primary transition-colors">
             {title}
           </h3>
