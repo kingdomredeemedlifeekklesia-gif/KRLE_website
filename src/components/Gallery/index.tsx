@@ -89,13 +89,6 @@ const Gallery = () => {
     return image.id ? `/api/gallery/image/${image.id}` : `/uploads/gallery/${image.filename}`;
   };
 
-  const getFallbackUrl = (image: GalleryImage) => {
-    if (image.url?.startsWith("/uploads/gallery/")) {
-      return image.url;
-    }
-    return image.url?.startsWith("/") ? image.url : `/uploads/gallery/${image.filename}`;
-  };
-
   const filteredImages = selectedCategory === "all"
     ? images
     : images.filter(img => img.category === selectedCategory);
