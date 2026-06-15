@@ -51,60 +51,9 @@ Startup Pro - Expertly crafted for fully-functional, high-performing SaaS startu
 
 - [🔌 Documentation](https://nextjstemplates.com/docs)
 
-### 📱 Community Messaging Setup
+### Community messaging
 
-This template includes an automated community messaging system for sending daily devotionals and service reminders via SMS and WhatsApp.
-
-#### Setup Steps:
-
-1. **Install Dependencies:**
-   ```bash
-   npm install
-   npx prisma db push
-   ```
-
-2. **Configure Twilio:**
-   - Sign up for a [Twilio account](https://www.twilio.com/)
-   - Get your Account SID, Auth Token, and phone numbers
-   - Enable WhatsApp Business API
-
-3. **Environment Variables:**
-   Copy `.env.example` to `.env.local` and fill in your Twilio credentials:
-   ```
-   TWILIO_ACCOUNT_SID=your_account_sid
-   TWILIO_AUTH_TOKEN=your_auth_token
-   TWILIO_PHONE_NUMBER=+1234567890
-   TWILIO_WHATSAPP_NUMBER=+1234567890
-   ```
-
-4. **Run the Scheduler:**
-   To start automated background jobs:
-   ```bash
-   npm run scheduler
-   ```
-
-   This process also runs Covenant Seed recurring card deductions independently of website visits.
-
-   To run the web server and scheduler together on a server, use PM2:
-   ```bash
-   npm install -g pm2
-   pm2 start ecosystem.config.js
-   pm2 save
-   ```
-
-   The scheduler is configured to execute due Covenant Seed charges every 30 minutes and retry failed attempts when the card is funded.
-
-#### Scheduled Messages:
-- **Daily Devotion:** Mon-Sun at 4:00 AM
-- **Wednesday Service Reminder:** Wed at 11:00 AM (with flyer image on WhatsApp)
-- **Friday Service Reminder:** Fri at 11:00 AM (with flyer image on WhatsApp)
-- **Saturday Service Reminder:** Sat at 4:00 PM (with flyer image on WhatsApp)
-- **Sunday Devotion:** Sun at 4:00 AM
-
-#### Admin Features:
-- View registered community members
-- Manually send test messages
-- Manage contact form submissions
+Community messaging (SMS/WhatsApp via Twilio) has been removed/disabled in this repository to avoid build-time issues. If you want to re-enable messaging later, add your preferred provider integration and configuration.
 
 ### ⚡ Deploy Now
 

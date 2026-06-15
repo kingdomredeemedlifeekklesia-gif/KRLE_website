@@ -6,12 +6,16 @@ import YouTubeVideoCard from "./YouTubeVideoCard";
 import sermonData from "./sermonData";
 import { getYouTubeVideos, YouTubeVideo } from "@/lib/youtube";
 
-const Sermon = () => {
+interface SermonSectionProps {
+  limit?: number;
+}
+
+const Sermon = ({ limit = 3 }: SermonSectionProps) => {
   const [youtubeVideos, setYoutubeVideos] = useState<YouTubeVideo[]>([]);
 
   useEffect(() => {
     async function fetchVideos() {
-      const videos = await getYouTubeVideos(3);
+      const videos = await getYouTubeVideos(limit);
       setYoutubeVideos(videos);
     }
     fetchVideos();

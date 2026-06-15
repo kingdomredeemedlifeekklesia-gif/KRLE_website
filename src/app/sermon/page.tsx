@@ -1,9 +1,8 @@
 import Breadcrumb from "@/components/Common/Breadcrumb";
 import SectionTitle from "@/components/Common/SectionTitle";
-import YouTubeVideoCard from "@/components/Sermon/YouTubeVideoCard";
+import YouTubeVideoSection from "@/components/Sermon/YouTubeVideoSection";
 import SingleSermon from "@/components/Sermon/SingleSermon";
 import sermonData from "@/components/Sermon/sermonData";
-import { getYouTubeVideos } from "@/lib/youtube";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -14,8 +13,6 @@ export const metadata: Metadata = {
 const isYouTubeConfigured = Boolean(process.env.NEXT_PUBLIC_YOUTUBE_API_KEY && process.env.NEXT_PUBLIC_YOUTUBE_CHANNEL_ID);
 
 const Blog = async () => {
-  const youtubeVideos = await getYouTubeVideos(50);
-
   return (
     <>
       <Breadcrumb
@@ -31,53 +28,22 @@ const Blog = async () => {
             center
           />
 
-          {youtubeVideos.length > 0 && (
-            <div className="mb-12">
-              <h2 className="mb-6 text-2xl font-semibold text-dark">YouTube Streams</h2>
-              <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-                {youtubeVideos.map((video) => (
-                  <YouTubeVideoCard
-                    key={video.id}
-                    id={video.id}
-                    title={video.title}
-                    thumbnail={video.thumbnail}
-                    publishedAt={video.publishedAt}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+          <YouTubeVideoSection />
 
-          {youtubeVideos.length === 0 && (
-            <div className="text-center text-body-color">
-              {!isYouTubeConfigured ? (
-                <p>
-                  No sermons available because YouTube is not configured. Please set <span className="font-semibold">NEXT_PUBLIC_YOUTUBE_API_KEY</span> and <span className="font-semibold">NEXT_PUBLIC_YOUTUBE_CHANNEL_ID</span> in your environment.
-                </p>
-              ) : (
-                <p>
-                  No sermons available right now. Make sure your YouTube API key and channel ID are valid, that the YouTube Data API is enabled, and try again shortly.
-                </p>
-              )}
+          <div className="mt-12">
+            <SectionTitle
+              title="Other Sermons"
+              paragraph="While the latest YouTube videos are unavailable, you can still explore recent sermon content below."
+              center={false}
+            />
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+              {sermonData.map((sermon) => (
+                <div key={sermon.id} className="w-full">
+                  <SingleSermon sermon={sermon} />
+                </div>
+              ))}
             </div>
-          )}
-
-          {youtubeVideos.length === 0 && (
-            <div className="mt-12">
-              <SectionTitle
-                title="Other Sermons"
-                paragraph="While the latest YouTube videos are unavailable, you can still explore recent sermon content below."
-                center={false}
-              />
-              <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-                {sermonData.map((sermon) => (
-                  <div key={sermon.id} className="w-full">
-                    <SingleSermon sermon={sermon} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          </div>
         </div>
       </section>
     </>
