@@ -33,7 +33,11 @@ export async function GET(request: Request, context: any) {
     else if (extension === ".webp") contentType = "image/webp";
     else if (extension === ".svg") contentType = "image/svg+xml";
 
-    return new NextResponse(image.imageBlob, {
+    // Convert Prisma Bytes/Buffer to a BodyInit-compatible type for NextResponse
+    const raw = image.imageBlob as unknown;
+    const bodyBuffer = (raw instanceof Buffer) ? raw : Buffer.from(raw as any);
+
+    return new NextResponse(bodyBuffer as unknown as BodyInit, {
       headers: {
         "Content-Type": contentType,
         "Content-Disposition": `inline; filename="${image.filename}"`,
