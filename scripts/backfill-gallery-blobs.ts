@@ -19,7 +19,8 @@ async function main() {
   let updated = 0;
   for (const filename of files) {
     try {
-      const image = await prisma.galleryImage.findUnique({ where: { filename } });
+      // filename is not a unique key in the schema, use findFirst
+      const image = await prisma.galleryImage.findFirst({ where: { filename } });
       if (!image) {
         console.log('No DB record for file, skipping:', filename);
         continue;
