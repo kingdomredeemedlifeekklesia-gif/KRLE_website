@@ -39,11 +39,12 @@ export async function POST(request: Request) {
       }
     }
 
-    // Generate ZIP buffer
-    const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
+    // Generate ZIP file as a Blob-compatible body
+    const zipArrayBuffer = await zip.generateAsync({ type: "arraybuffer" });
+    const zipBlob = new Blob([zipArrayBuffer]);
 
     // Return ZIP file
-    return new NextResponse(zipBuffer, {
+    return new NextResponse(zipBlob, {
       headers: {
         "Content-Type": "application/zip",
         "Content-Disposition": `attachment; filename="gallery-images-${Date.now()}.zip"`,

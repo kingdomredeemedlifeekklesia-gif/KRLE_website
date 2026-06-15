@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model UploadedVideo {
@@ -21,7 +22,7 @@ model ContactMessage {
   email      String
   whatsapp   String?
   message    String
-  status     String   @default("unread") // unread | read | replied
+  status     String   @default("unread")
   adminReply String?
   adminNote  String?
   createdAt  DateTime @default(now())
@@ -41,7 +42,7 @@ model GalleryImage {
   description String?
   filename    String
   url         String
-  category    String   // programs, services, events, etc.
+  category    String
   uploadedAt  DateTime @default(now())
 }
 
@@ -52,7 +53,7 @@ model PaymentTransaction {
   amount    Float
   currency  String   @default("GHS")
   purpose   String
-  type      String   // donation | expense
+  type      String
   status    String   @default("Completed")
   provider  String?
   note      String?

@@ -1,45 +1,42 @@
 {
-  "name": "startup-nextjs-template",
-  "version": "2.2.1",
+  "name": "krle-website",
+  "version": "1.0.0",
+  "description": "Kingdom Redeemed Life Ekklesia Church Website",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "postinstall": "prisma generate",
-    "build": "next build",
+    "build": "prisma generate && next build",
+    "db:push": "prisma db push --skip-generate --accept-data-loss",
     "start": "next start",
     "lint": "next lint",
+    "postinstall": "prisma generate",
     "scheduler": "tsx scripts/scheduler.ts"
   },
   "dependencies": {
-    "@paystack/inline-js": "^2.22.8",
-    "@prisma/client": "^7.8.0",
-    "@tailwindcss/postcss": "^4.1.3",
-    "eslint": "^9.24.0",
-    "eslint-config-next": "15.1.6",
-    "jszip": "^3.10.1",
-    "next": "16.0.10",
-    "next-themes": "^0.2.1",
-    "node-cron": "^4.2.1",
-    "postcss": "^8.5.3",
-    "prisma": "^7.8.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "tailwindcss": "^4.1.3",
-    "twilio": "^6.0.1"
-  },
-  "devDependencies": {
-    "@types/node": "^20.8.9",
-    "@types/node-cron": "^3.0.11",
-    "@types/react": "19.1.0",
-    "@types/react-dom": "19.1.0",
+    "@prisma/client": "^5.17.0",
+    "@swc/helpers": "^0.5.23",
     "autoprefixer": "^10.4.17",
-    "dotenv": "^17.4.2",
-    "prettier": "^3.2.5",
-    "prettier-plugin-tailwindcss": "^0.6.11",
-    "tsx": "^4.21.0",
+    "caniuse-lite": "^1.0.30001799",
+    "jszip": "^3.10.1",
+    "next": "^16.2.9",
+    "node-cron": "^3.0.3",
+    "postcss": "^8.4.32",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "twilio": "^4.10.0",
     "typescript": "^5.3.3"
   },
-  "engines": {
-    "node": ">=20"
+  "devDependencies": {
+    "@tailwindcss/nesting": "^0.0.0-insiders.565cd3e",
+    "@tailwindcss/postcss": "^4.3.1",
+    "@types/node": "^20.10.6",
+    "@types/node-cron": "^3.0.11",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^16.0.0",
+    "prisma": "^5.17.0",
+    "tailwindcss": "^4.3.1",
+    "tsx": "^4.7.0"
   }
 }

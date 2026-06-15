@@ -45,7 +45,8 @@ const DonationForm = () => {
 
     const existingScript = document.querySelector('script[src="https://js.paystack.co/v1/inline.js"]') as HTMLScriptElement | null;
     if (existingScript) {
-      if (existingScript.readyState === "complete" || existingScript.readyState === "loaded") {
+      const scriptReadyState = (existingScript as any).readyState;
+      if (scriptReadyState === "complete" || scriptReadyState === "loaded") {
         if ((window as any).PaystackPop) {
           setPaystackLoaded(true);
           setPaystackLoading(false);

@@ -1,18 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ChangeEvent } from "react";
+
+type UploadedImage = {
+  id: number;
+  name: string;
+  url: string;
+};
 
 const SiteManagementPage = () => {
   const [heroTitle, setHeroTitle] = useState("Welcome to Kingdom Redeemed Life Ecclesia");
   const [heroSubtitle, setHeroSubtitle] = useState("A place of worship, fellowship, and spiritual growth");
-  const [uploadedImages, setUploadedImages] = useState([]);
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
 
   const handleSave = () => {
     // Mock save functionality
     alert("Changes saved!");
   };
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     // Mock upload - in real app, upload to server
     const newImages = files.map((file, index) => ({
@@ -23,7 +29,7 @@ const SiteManagementPage = () => {
     setUploadedImages([...uploadedImages, ...newImages]);
   };
 
-  const handleDeleteImage = (id) => {
+  const handleDeleteImage = (id: number) => {
     setUploadedImages(uploadedImages.filter(img => img.id !== id));
   };
 
