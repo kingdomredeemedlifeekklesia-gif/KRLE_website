@@ -2,10 +2,19 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import path from "path";
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, context: any) {
   try {
+    // Next.js may provide params directly or as a Promise - handle both.
+    const rawParams = context?.params;
+    const params = rawParams && typeof rawParams.then === "function" ? await rawParams : rawParams;
+    const id = params?.id;
+
+    if (!id) {
+      return NextResponse.json({ error: "Image ID is required." }, { status: 400 });
+    }
+
     const image = await prisma.galleryImage.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!image) {
