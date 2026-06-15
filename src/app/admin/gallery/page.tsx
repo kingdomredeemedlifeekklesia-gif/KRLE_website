@@ -26,6 +26,13 @@ const GalleryPage = () => {
   const [category, setCategory] = useState("programs");
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
 
+  const normalizeImageUrl = (url: string, filename: string) => {
+    if (url?.startsWith("/")) {
+      return url;
+    }
+    return url ? `/${url}` : `/uploads/gallery/${filename}`;
+  };
+
   useEffect(() => {
     fetchImages();
   }, []);
@@ -33,6 +40,7 @@ const GalleryPage = () => {
   const fetchImages = async () => {
     try {
       setLoading(true);
+      setError("");
       const response = await fetch("/api/gallery");
       if (!response.ok) {
         throw new Error("Failed to load gallery images.");
@@ -319,9 +327,12 @@ const GalleryPage = () => {
                     className="absolute top-2 left-2 z-10"
                   />
                   <img
-                    src={image.url}
+                    src={normalizeImageUrl(image.url, image.filename)}
                     alt={image.title}
                     className="w-full h-48 object-cover"
+                    onError={(e) => {
+                      console.error(`Failed to load image: ${normalizeImageUrl(image.url, image.filename)}`);
+                    }}
                   />
                 </div>
                 <div className="p-4">

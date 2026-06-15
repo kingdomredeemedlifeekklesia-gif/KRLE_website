@@ -16,6 +16,7 @@ interface GalleryImage {
 const Gallery = () => {
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set());
   const [lightboxImage, setLightboxImage] = useState<GalleryImage | null>(null);
@@ -53,17 +54,29 @@ const Gallery = () => {
   const fetchImages = async () => {
     try {
       setLoading(true);
+      setError("");
       const response = await fetch("/api/gallery");
       if (!response.ok) {
         throw new Error("Failed to load gallery images.");
       }
       const data: GalleryImage[] = await response.json();
-      setImages(data);
+      setImages(data.map((img) => ({
+        ...img,
+        url: img.url.startsWith("/") ? img.url : `/${img.url}`,
+      })));
     } catch (err) {
       console.error("Failed to load images:", err);
+      setError(err instanceof Error ? err.message : "Unable to load gallery images.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const getImageUrl = (url: string, filename: string) => {
+    if (url?.startsWith("/")) {
+      return url;
+    }
+    return url ? `/${url}` : `/uploads/gallery/${filename}`;
   };
 
   const filteredImages = selectedCategory === "all"
@@ -166,6 +179,10 @@ const Gallery = () => {
           <div className="text-center py-12">
             <p className="text-gray-600 dark:text-gray-300">Loading gallery...</p>
           </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-red-600 dark:text-red-300">{error}</p>
+          </div>
         ) : filteredImages.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 dark:text-gray-400">
@@ -198,9 +215,11 @@ const Gallery = () => {
                   aria-label={`View ${image.title}`}
                 >
                   <Image
-                    src={image.url}
+                    src={getImageUrl(image.url, image.filename)}
                     alt={image.title}
                     fill
+                    unoptimized
+                    sizes="100vw"
                     className="object-cover transition-transform duration-300"
                   />
                 </div>
@@ -254,10 +273,11 @@ const Gallery = () => {
               </button>
               <div className="relative rounded-lg bg-black p-4">
                 <Image
-                  src={lightboxImage.url}
+                  src={getImageUrl(lightboxImage.url, lightboxImage.filename)}
                   alt={lightboxImage.title}
                   width={800}
                   height={600}
+                  unoptimized
                   className="max-w-full max-h-[80vh] object-contain"
                 />
                 <div className="mt-4 text-white">
