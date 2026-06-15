@@ -93,8 +93,8 @@ export default function YouTubeVideoSection() {
                 <YouTubeVideoCard
                   id={sermon.id}
                   title={sermon.title}
-                  thumbnail={sermon.thumbnail}
-                  publishedAt={sermon.date}
+                  thumbnail={sermon.image}
+                  publishedAt={sermon.publishDate}
                 />
               </div>
             ))}
