@@ -41,12 +41,6 @@ export default function YouTubeVideoSection() {
 
   return (
     <>
-      <SectionTitle
-        title="All Sermons & Streams"
-        paragraph="Watch sermon videos directly from our YouTube channel. Configure your YouTube access to display the latest messages here."
-        center
-      />
-
       {isLoaded && youtubeVideos.length > 0 && (
         <div className="mb-12">
           <h2 className="mb-6 text-2xl font-semibold text-dark">YouTube Streams</h2>
