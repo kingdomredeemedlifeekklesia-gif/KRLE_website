@@ -1,9 +1,10 @@
 import Breadcrumb from "@/components/Common/Breadcrumb";
 import SectionTitle from "@/components/Common/SectionTitle";
-import YouTubeVideoSection from "@/components/Sermon/YouTubeVideoSection";
+import YouTubeVideoList from "@/components/Sermon/YouTubeVideoList";
 import SingleSermon from "@/components/Sermon/SingleSermon";
 import sermonData from "@/components/Sermon/sermonData";
 import { Metadata } from "next";
+import { getYouTubeVideos } from "@/lib/youtube";
 
 export const metadata: Metadata = {
   title: "Sermons | Kingdom Redeemed Life Ecclesia",
@@ -13,6 +14,8 @@ export const metadata: Metadata = {
 const isYouTubeConfigured = Boolean(process.env.NEXT_PUBLIC_YOUTUBE_API_KEY && process.env.NEXT_PUBLIC_YOUTUBE_CHANNEL_ID);
 
 const Blog = async () => {
+  const videos = isYouTubeConfigured ? await getYouTubeVideos(50) : [];
+
   return (
     <>
       <Breadcrumb
@@ -28,22 +31,8 @@ const Blog = async () => {
             center
           />
 
-          <YouTubeVideoSection />
+          <YouTubeVideoList videos={videos} />
 
-          <div className="mt-12">
-            <SectionTitle
-              title="Other Sermons"
-              paragraph="While the latest YouTube videos are unavailable, you can still explore recent sermon content below."
-              center={false}
-            />
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-              {sermonData.map((sermon) => (
-                <div key={sermon.id} className="w-full">
-                  <SingleSermon sermon={sermon} />
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
     </>

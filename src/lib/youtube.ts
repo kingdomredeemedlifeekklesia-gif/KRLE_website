@@ -40,7 +40,9 @@ export async function getYouTubeVideos(limit: number = 10): Promise<YouTubeVideo
       description: item.snippet.description,
       thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url,
       publishedAt: item.snippet.publishedAt,
-      isLive: false,
+      // YouTube provides `liveBroadcastContent` as 'none' | 'upcoming' | 'live'
+      // treat 'live' and 'upcoming' as live-related content for filtering
+      isLive: (item.snippet?.liveBroadcastContent || "none") !== "none",
     }));
   } catch (error) {
     console.error("Error fetching YouTube videos:", error);

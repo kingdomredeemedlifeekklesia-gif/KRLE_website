@@ -28,15 +28,27 @@ export async function POST(request: Request) {
     // Create ZIP file
     const zip = new JSZip();
 
+    let filesAdded = 0;
     for (const image of images) {
-      const imagePath = path.join(process.cwd(), "public", image.url);
+      // Ensure we don't treat a leading slash as an absolute path segment
+      const relativeUrl = image.url?.replace(/^\/+/, "") || image.filename;
+      const imagePath = path.join(process.cwd(), "public", relativeUrl);
       try {
+        if (!fs.existsSync(imagePath)) {
+          console.warn(`Image file not found on disk: ${imagePath}`);
+          continue;
+        }
         const imageBuffer = fs.readFileSync(imagePath);
         zip.file(image.filename, imageBuffer);
+        filesAdded++;
       } catch (error) {
         console.error(`Failed to read image ${image.filename}:`, error);
         // Continue with other images
       }
+    }
+
+    if (filesAdded === 0) {
+      return NextResponse.json({ error: "No image files available for download." }, { status: 404 });
     }
 
     // Generate ZIP file as a Blob-compatible body

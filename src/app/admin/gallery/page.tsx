@@ -25,6 +25,7 @@ const GalleryPage = () => {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("programs");
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
+  const [previewFiles, setPreviewFiles] = useState<Array<{ name: string; url: string }>>([]);
 
   const normalizeImageUrl = (url: string, filename: string) => {
     if (url?.startsWith("/")) {
@@ -32,6 +33,12 @@ const GalleryPage = () => {
     }
     return url ? `/${url}` : `/uploads/gallery/${filename}`;
   };
+
+  useEffect(() => {
+    return () => {
+      previewFiles.forEach((file) => URL.revokeObjectURL(file.url));
+    };
+  }, [previewFiles]);
 
   useEffect(() => {
     fetchImages();
@@ -46,7 +53,10 @@ const GalleryPage = () => {
         throw new Error("Failed to load gallery images.");
       }
       const data: GalleryImage[] = await response.json();
-      setImages(data);
+      setImages(data.map((image) => ({
+        ...image,
+        url: normalizeImageUrl(image.url, image.filename),
+      })));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to load gallery images.");
     } finally {
@@ -55,14 +65,24 @@ const GalleryPage = () => {
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("File selection changed:", e.target.files);
-    setSelectedFiles(e.target.files);
+    const files = e.target.files;
+    setSelectedFiles(files);
+
+    if (!files || files.length === 0) {
+      setPreviewFiles([]);
+      return;
+    }
+
+    const previews: Array<{ name: string; url: string }> = [];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      previews.push({ name: file.name, url: URL.createObjectURL(file) });
+    }
+    setPreviewFiles(previews);
   };
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Upload form submitted");
-    console.log("Selected files:", selectedFiles);
 
     if (!selectedFiles || selectedFiles.length === 0) {
       setError("Please select at least one file.");
@@ -78,42 +98,34 @@ const GalleryPage = () => {
       formData.append("description", description);
       formData.append("category", category);
 
-      console.log("Form data prepared:", { title, description, category });
-
       for (let i = 0; i < selectedFiles.length; i++) {
-        console.log("Adding file:", selectedFiles[i].name, "Size:", selectedFiles[i].size);
         formData.append("files", selectedFiles[i]);
       }
-
-      console.log("Sending request to /api/gallery");
 
       const response = await fetch("/api/gallery", {
         method: "POST",
         body: formData,
       });
 
-      console.log("Response status:", response.status);
-
       if (!response.ok) {
-        const errorData = await response.json();
-        console.log("Error response:", errorData);
-        throw new Error(errorData.error || "Failed to upload images.");
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.error || "Failed to upload images.");
       }
 
-      const result = await response.json();
-      console.log("Upload successful:", result);
-
+      await fetchImages();
+      setSelectedFiles(null);
+      setPreviewFiles([]);
       setTitle("");
       setDescription("");
       setCategory("programs");
-      setSelectedFiles(null);
-      // Reset the file input
-      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-      if (fileInput) fileInput.value = "";
       setShowUploadForm(false);
-      await fetchImages();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to upload images.");
+
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement | null;
+      if (fileInput) {
+        fileInput.value = "";
+      }
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Unable to upload images.");
     } finally {
       setUploading(false);
     }
@@ -266,6 +278,24 @@ const GalleryPage = () => {
                 </p>
               )}
             </div>
+
+            {previewFiles.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                {previewFiles.map((file) => (
+                  <div key={file.url} className="border border-gray-200 dark:border-gray-700 rounded overflow-hidden">
+                    <img
+                      src={file.url}
+                      alt={file.name}
+                      className="h-32 w-full object-cover"
+                    />
+                    <div className="p-2 bg-gray-50 dark:bg-gray-900 text-xs text-gray-700 dark:text-gray-300">
+                      {file.name}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={uploading}

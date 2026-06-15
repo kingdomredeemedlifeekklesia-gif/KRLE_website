@@ -15,11 +15,19 @@ const Sermon = ({ limit = 3 }: SermonSectionProps) => {
 
   useEffect(() => {
     async function fetchVideos() {
-      const videos = await getYouTubeVideos(limit);
-      setYoutubeVideos(videos);
+      // Fetch a larger batch and then filter for live/upcoming streams
+      const videos = await getYouTubeVideos(Math.max(limit, 10));
+      const liveVideos = videos.filter((v) => v.isLive).slice(0, limit);
+      if (liveVideos.length > 0) {
+        setYoutubeVideos(liveVideos);
+        return;
+      }
+
+      // Fallback to the most recent videos if no live streams found
+      setYoutubeVideos(videos.slice(0, limit));
     }
     fetchVideos();
-  }, []);
+  }, [limit]);
 
   return (
     <section id="sermon" className="bg-gray-light py-16 md:py-20 lg:py-28">
