@@ -36,6 +36,11 @@ export async function POST(request: Request) {
       try {
         if (!fs.existsSync(imagePath)) {
           console.warn(`Image file not found on disk: ${imagePath}`);
+          if (image.imageBlob) {
+            zip.file(image.filename, image.imageBlob);
+            filesAdded++;
+            continue;
+          }
           continue;
         }
         const imageBuffer = fs.readFileSync(imagePath);

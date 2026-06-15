@@ -7,6 +7,15 @@ export async function GET() {
   try {
     const images = await prisma.galleryImage.findMany({
       orderBy: { uploadedAt: "desc" },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        filename: true,
+        url: true,
+        category: true,
+        uploadedAt: true,
+      },
     });
 
     return NextResponse.json(images);
@@ -85,6 +94,9 @@ export async function POST(request: Request) {
       const buffer = Buffer.from(bytes);
       await writeFile(filepath, buffer);
 
+      // Persist blob data in the database in case the filesystem is unavailable in production.
+      const imageBlob = buffer;
+
       console.log("File saved successfully, saving to database");
 
       // Save to database
@@ -95,11 +107,20 @@ export async function POST(request: Request) {
           filename,
           url: `/uploads/gallery/${filename}`,
           category,
+          imageBlob,
         },
       });
 
       console.log("Database record created:", image.id);
-      uploadedImages.push(image);
+      uploadedImages.push({
+        id: image.id,
+        title: image.title,
+        description: image.description,
+        filename: image.filename,
+        url: image.url,
+        category: image.category,
+        uploadedAt: image.uploadedAt,
+      });
     }
 
     console.log("Upload completed successfully, uploaded", uploadedImages.length, "images");

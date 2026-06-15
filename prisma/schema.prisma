@@ -43,6 +43,7 @@ model GalleryImage {
   filename    String
   url         String
   category    String
+  imageBlob   Bytes?
   uploadedAt  DateTime @default(now())
 }
 

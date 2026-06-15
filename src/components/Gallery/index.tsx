@@ -79,6 +79,23 @@ const Gallery = () => {
     return url ? `/${url}` : `/uploads/gallery/${filename}`;
   };
 
+  const getFallbackUrl = (image: GalleryImage) => {
+    if (image.url?.startsWith("/uploads/gallery/")) {
+      return image.url;
+    }
+    if (image.url?.startsWith("/api/gallery/image/")) {
+      return image.url;
+    }
+    return image.id ? `/api/gallery/image/${image.id}` : `/uploads/gallery/${image.filename}`;
+  };
+
+  const getFallbackUrl = (image: GalleryImage) => {
+    if (image.url?.startsWith("/uploads/gallery/")) {
+      return image.url;
+    }
+    return image.url?.startsWith("/") ? image.url : `/uploads/gallery/${image.filename}`;
+  };
+
   const filteredImages = selectedCategory === "all"
     ? images
     : images.filter(img => img.category === selectedCategory);
@@ -221,6 +238,10 @@ const Gallery = () => {
                     unoptimized
                     sizes="100vw"
                     className="object-cover transition-transform duration-300"
+                    onError={(event) => {
+                      const target = event.target as HTMLImageElement;
+                      target.src = getFallbackUrl(image);
+                    }}
                   />
                 </div>
 
@@ -273,12 +294,16 @@ const Gallery = () => {
               </button>
               <div className="relative rounded-lg bg-black p-4">
                 <Image
-                  src={getImageUrl(lightboxImage.url, lightboxImage.filename)}
+                    src={getImageUrl(lightboxImage.url, lightboxImage.filename)}
                   alt={lightboxImage.title}
                   width={800}
                   height={600}
                   unoptimized
                   className="max-w-full max-h-[80vh] object-contain"
+                    onError={(event) => {
+                      const target = event.target as HTMLImageElement;
+                      target.src = getFallbackUrl(lightboxImage);
+                    }}
                 />
                 <div className="mt-4 text-white">
                   <h3 className="text-xl font-semibold mb-2">{lightboxImage.title}</h3>

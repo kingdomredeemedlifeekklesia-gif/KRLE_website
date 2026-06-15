@@ -34,6 +34,16 @@ const GalleryPage = () => {
     return url ? `/${url}` : `/uploads/gallery/${filename}`;
   };
 
+  const getFallbackUrl = (image: GalleryImage) => {
+    if (image.url?.startsWith("/uploads/gallery/")) {
+      return image.url;
+    }
+    if (image.url?.startsWith("/api/gallery/image/")) {
+      return image.url;
+    }
+    return image.id ? `/api/gallery/image/${image.id}` : `/uploads/gallery/${image.filename}`;
+  };
+
   useEffect(() => {
     return () => {
       previewFiles.forEach((file) => URL.revokeObjectURL(file.url));
@@ -199,7 +209,7 @@ const GalleryPage = () => {
 
   const handleDownloadSingle = async (image: GalleryImage) => {
     const link = document.createElement("a");
-    link.href = image.url;
+    link.href = getFallbackUrl(image);
     link.download = image.filename;
     link.click();
   };
