@@ -1,12 +1,27 @@
 import { NextResponse } from "next/server";
 import twilio from "twilio";
 
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
 const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 
-// Initialize Twilio client only if credentials are available
-const twilioClient = accountSid && authToken ? twilio(accountSid, authToken) : null;
+function createTwilioClient() {
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+
+  if (!accountSid || !authToken) return null;
+
+  // Validate common Twilio Account SID format (starts with 'AC') to avoid constructor errors
+  if (!accountSid.startsWith("AC")) {
+    console.error(`TWILIO_ACCOUNT_SID appears invalid: ${accountSid}`);
+    return null;
+  }
+
+  try {
+    return twilio(accountSid, authToken);
+  } catch (err) {
+    console.error("Failed to initialize Twilio client:", err);
+    return null;
+  }
+}
 
 export async function POST(request: Request) {
   try {
@@ -23,12 +38,13 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if Twilio is configured
+    // Initialize Twilio client lazily at request time and check configuration
+    const twilioClient = createTwilioClient();
     if (!twilioClient || !twilioPhoneNumber) {
       return NextResponse.json(
         {
-          error: "SMS service is not configured. Please set Twilio credentials in environment variables.",
-          hint: "Add TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_PHONE_NUMBER to .env.local",
+          error: "SMS service is not configured or invalid credentials provided.",
+          hint: "Ensure TWILIO_ACCOUNT_SID starts with 'AC' and TWILIO_AUTH_TOKEN and TWILIO_PHONE_NUMBER are set in environment variables.",
         },
         { status: 500 }
       );
