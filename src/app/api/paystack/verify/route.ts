@@ -18,29 +18,51 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, message: "Transaction already recorded" });
     }
 
-    // Verify with Paystack
+    // Verify with Paystack (or use devData when secret key is not configured)
     const secretKey = process.env.PAYSTACK_SECRET_KEY;
+    let data: any = null;
     if (!secretKey) {
-      console.error("Paystack secret key not configured");
-      return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
+      // Allow a developer-provided payload for local testing
+      const body = await request.json();
+      const devData = body?.devData;
+      if (!devData) {
+        console.error("Paystack secret key not configured and no devData provided");
+        return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
+      }
+      // Normalize devData into a structure similar to Paystack's verify `data`
+      data = {
+        amount: Math.round((devData.amount || 0) * 100),
+        currency: devData.currency || "GHS",
+        channel: devData.paymentMethod === "card" ? "card" : "mobile_money",
+        customer: { email: devData.email || null, phone: null, customer_code: null },
+        reference,
+        metadata: {
+          custom_fields: [
+            { variable_name: "name", value: devData.name || null },
+            { variable_name: "purpose", value: devData.purpose || "Donation" },
+          ],
+        },
+        authorization: null,
+        status: "success",
+      };
+    } else {
+      const verifyResponse = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
+        headers: {
+          Authorization: `Bearer ${secretKey}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const verifyData = await verifyResponse.json();
+
+      if (!verifyResponse.ok || verifyData.status !== true || verifyData.data.status !== "success") {
+        console.error("Paystack verification failed:", verifyData);
+        return NextResponse.json({ error: "Payment verification failed" }, { status: 400 });
+      }
+
+      // Extract transaction details
+      data = verifyData.data;
     }
-
-    const verifyResponse = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
-      headers: {
-        Authorization: `Bearer ${secretKey}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    const verifyData = await verifyResponse.json();
-
-    if (!verifyResponse.ok || verifyData.status !== true || verifyData.data.status !== "success") {
-      console.error("Paystack verification failed:", verifyData);
-      return NextResponse.json({ error: "Payment verification failed" }, { status: 400 });
-    }
-
-    // Extract transaction details
-    const { data } = verifyData;
     const recurringMetadata = data.metadata?.custom_fields?.find((f: any) => f.variable_name === "recurring")?.value;
     const recurringLabel = recurringMetadata ? String(recurringMetadata) : "One-time";
     const recurringAmount = data.amount / 100; // Convert from kobo to GHS

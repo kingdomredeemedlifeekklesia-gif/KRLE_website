@@ -145,25 +145,49 @@ const DonationForm = () => {
           },
         ],
       },
-      callback: (response: any) => {
-        fetch('/api/paystack/verify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reference: response.reference }),
-        })
-          .then(verifyResponse => verifyResponse.json())
-          .then(result => {
-            if (result.success) {
-              setPaymentStatus(`Payment successful! Reference: ${response.reference}`);
-              alert(`Payment successful! Reference: ${response.reference}`);
-            } else {
-              setPaymentError('Payment verification failed. Please contact support.');
-            }
-          })
-          .catch(error => {
-            console.error('Verification error:', error);
-            setPaymentError('Payment verification failed. Please contact support.');
+      callback: async (response: any) => {
+        try {
+          const verifyResponse = await fetch('/api/paystack/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              reference: response.reference,
+              devData: {
+                name,
+                email,
+                amount: Math.round(parseFloat(amount) * 100) / 100,
+                currency: 'GHS',
+                paymentMethod,
+              },
+            }),
           });
+
+          if (!verifyResponse.ok) {
+            const text = await verifyResponse.text();
+            console.error('Verify non-OK response:', verifyResponse.status, text);
+            setPaymentError('Payment verification failed. Please contact support.');
+            return;
+          }
+
+          const result = await verifyResponse.json();
+          if (result && result.success) {
+            setPaymentStatus('Payment completed successfully.');
+            // Optionally include reference in console for debugging
+            console.info('Payment verified:', response.reference);
+            // Notify admin UI: attempt to post a small event to refresh admin (best-effort)
+            try {
+              await fetch('/api/admin/refresh-payments', { method: 'POST' });
+            } catch (e) {
+              // ignore; admin page will pick up new record on next load
+            }
+          } else {
+            console.error('Verification result:', result);
+            setPaymentError('Payment verification failed. Please contact support.');
+          }
+        } catch (error) {
+          console.error('Verification error:', error);
+          setPaymentError('Payment verification failed. Please contact support.');
+        }
       },
       onClose: () => {
         setPaymentError("Payment cancelled.");
