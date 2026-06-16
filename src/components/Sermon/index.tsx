@@ -1,9 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import SectionTitle from "../Common/SectionTitle";
-import SingleSermon from "./SingleSermon";
 import YouTubeVideoCard from "./YouTubeVideoCard";
-import sermonData from "./sermonData";
 import { getYouTubeVideos, YouTubeVideo } from "@/lib/youtube";
 
 interface SermonSectionProps {
@@ -12,20 +10,25 @@ interface SermonSectionProps {
 
 const Sermon = ({ limit = 3 }: SermonSectionProps) => {
   const [youtubeVideos, setYoutubeVideos] = useState<YouTubeVideo[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchVideos() {
-      // Fetch a larger batch and then filter for live/upcoming streams
-      const videos = await getYouTubeVideos(Math.max(limit, 10));
-      const liveVideos = videos.filter((v) => v.isLive).slice(0, limit);
-      if (liveVideos.length > 0) {
-        setYoutubeVideos(liveVideos);
-        return;
+      try {
+        const videos = await getYouTubeVideos(Math.max(limit, 10));
+        // Prefer live streams, otherwise latest videos
+        const liveVideos = videos.filter((v) => v.isLive).slice(0, limit);
+        const chosen = liveVideos.length > 0 ? liveVideos : videos.slice(0, limit);
+        setYoutubeVideos(chosen.slice(0, limit));
+      } catch (err) {
+        console.error("Failed to fetch YouTube videos:", err);
+        setError("No sermons available at the moment.");
+      } finally {
+        setLoaded(true);
       }
-
-      // Fallback to the most recent videos if no live streams found
-      setYoutubeVideos(videos.slice(0, limit));
     }
+
     fetchVideos();
   }, [limit]);
 
@@ -49,12 +52,13 @@ const Sermon = ({ limit = 3 }: SermonSectionProps) => {
               />
             </div>
           ))}
-          {sermonData.slice(0, 3 - youtubeVideos.length).map((sermon) => (
-            <div key={sermon.id} className="w-full">
-              <SingleSermon sermon={sermon} />
-            </div>
-          ))}
         </div>
+        {!loaded && (
+          <div className="text-center py-8">Loading latest sermons...</div>
+        )}
+        {loaded && youtubeVideos.length === 0 && (
+          <div className="text-center py-8">{error ?? "No sermons available at the moment."}</div>
+        )}
       </div>
     </section>
   );

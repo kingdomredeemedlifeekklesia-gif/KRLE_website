@@ -1,8 +1,6 @@
 import Breadcrumb from "@/components/Common/Breadcrumb";
 import SectionTitle from "@/components/Common/SectionTitle";
 import YouTubeVideoList from "@/components/Sermon/YouTubeVideoList";
-import SingleSermon from "@/components/Sermon/SingleSermon";
-import sermonData from "@/components/Sermon/sermonData";
 import { Metadata } from "next";
 import { getYouTubeVideos } from "@/lib/youtube";
 

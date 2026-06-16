@@ -20,6 +20,13 @@ export async function GET() {
 
     return NextResponse.json(images);
   } catch (error) {
+    console.error("Gallery GET error:", error);
+    // If the database is unreachable (e.g., running locally without DATABASE_URL),
+    // return an empty list instead of a 500 so the gallery UI can degrade gracefully.
+    const message = String(error || "");
+    if (message.includes("Can't reach database server") || message.includes("PrismaClientInitializationError")) {
+      return NextResponse.json([], { status: 200 });
+    }
     return NextResponse.json({ error: "Failed to load gallery images." }, { status: 500 });
   }
 }

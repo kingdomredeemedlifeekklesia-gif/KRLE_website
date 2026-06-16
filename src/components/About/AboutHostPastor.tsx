@@ -14,14 +14,14 @@ const AboutHostPastor = () => {
                     alt="host pastor"
                     fill
                     sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 500px"
-                    className="object-cover transition duration-500 dark:hidden"
+                    className="object-cover object-center transition duration-500 dark:hidden"
                   />
                   <Image
                     src="/images/about/IMG_0951img_0951.jpg"
                     alt="host pastor"
                     fill
                     sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 500px"
-                    className="hidden object-cover transition duration-500 dark:block"
+                    className="hidden object-cover object-center transition duration-500 dark:block"
                   />
                 </div>
               </div>

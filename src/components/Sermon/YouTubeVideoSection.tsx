@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import SectionTitle from "@/components/Common/SectionTitle";
 import YouTubeVideoCard from "./YouTubeVideoCard";
-import sermonData from "./sermonData";
 import { getYouTubeVideos, YouTubeVideo } from "@/lib/youtube";
 
 export default function YouTubeVideoSection() {
@@ -24,13 +23,11 @@ export default function YouTubeVideoSection() {
 
     const fetchVideos = async () => {
       try {
-        const videos = await getYouTubeVideos(50);
-        setYoutubeVideos(videos);
+        const videos = await getYouTubeVideos(3);
+        setYoutubeVideos(videos.slice(0, 3));
       } catch (error) {
         console.error("YouTube fetch failed:", error);
-        setErrorMessage(
-          "Unable to fetch YouTube videos right now. Please check your API key and channel settings."
-        );
+        setErrorMessage("No sermons available at the moment.");
       } finally {
         setIsLoaded(true);
       }
@@ -64,35 +61,9 @@ export default function YouTubeVideoSection() {
             <p>
               No sermons available because YouTube is not configured. Please set <span className="font-semibold">NEXT_PUBLIC_YOUTUBE_API_KEY</span> and <span className="font-semibold">NEXT_PUBLIC_YOUTUBE_CHANNEL_ID</span> in your environment.
             </p>
-          ) : errorMessage ? (
-            <p>{errorMessage}</p>
           ) : (
-            <p>
-              No sermons available right now. Make sure your YouTube API key and channel ID are valid, that the YouTube Data API is enabled, and try again shortly.
-            </p>
+            <p>{errorMessage ?? "No sermons available at the moment."}</p>
           )}
-        </div>
-      )}
-
-      {isLoaded && youtubeVideos.length === 0 && (
-        <div className="mt-12">
-          <SectionTitle
-            title="Other Sermons"
-            paragraph="While the latest YouTube videos are unavailable, you can still explore recent sermon content below."
-            center={false}
-          />
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-            {sermonData.map((sermon) => (
-              <div key={sermon.id} className="w-full">
-                <YouTubeVideoCard
-                  id={sermon.id}
-                  title={sermon.title}
-                  thumbnail={sermon.image}
-                  publishedAt={sermon.publishDate}
-                />
-              </div>
-            ))}
-          </div>
         </div>
       )}
     </>

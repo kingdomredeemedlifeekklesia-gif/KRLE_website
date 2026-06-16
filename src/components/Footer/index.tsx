@@ -40,7 +40,33 @@ const Footer = () => {
                       <path
                         d="M12.1 10.4939V7.42705C12.1 6.23984 13.085 5.27741 14.3 5.27741H16.5V2.05296L13.5135 1.84452C10.9664 1.66676 8.8 3.63781 8.8 6.13287V10.4939H5.5V13.7183H8.8V20.1667H12.1V13.7183H15.4L16.5 10.4939H12.1Z"
                         fill="currentColor"
-                      />
+                  />
+                    </svg>
+                  </a>
+                  {/* Instagram */}
+                  <a
+                    href={process.env.NEXT_PUBLIC_INSTAGRAM_URL || "/"}
+                    aria-label="instagram-link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-6 text-body-color duration-300 hover:text-primary dark:text-body-color-dark dark:hover:text-primary"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M7 2h10a5 5 0 015 5v10a5 5 0 01-5 5H7a5 5 0 01-5-5V7a5 5 0 015-5z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M12 8.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M17.5 6.5h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </a>
+                  {/* TikTok */}
+                  <a
+                    href={process.env.NEXT_PUBLIC_TIKTOK_URL || "/"}
+                    aria-label="tiktok-link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-6 text-body-color duration-300 hover:text-primary dark:text-body-color-dark dark:hover:text-primary"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9 8v8a4 4 0 004 4c4 0 4-4 4-4V8h-3v6a1 1 0 01-1 1 1 1 0 01-1-1V6H9v2z" fill="currentColor" />
                     </svg>
                   </a>
                   <a
