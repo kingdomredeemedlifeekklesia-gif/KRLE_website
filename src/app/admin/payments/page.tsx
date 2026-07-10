@@ -8,6 +8,7 @@ interface PaymentTransaction {
   email: string | null;
   amount: number;
   currency: string;
+  reference: string | null;
   purpose: string;
   type: string;
   status: string;
@@ -204,17 +205,25 @@ const PaymentsPage = () => {
     [completedTransactions]
   );
 
+  const normalizePurpose = (value: string | null | undefined) => (value || "").trim().toLowerCase();
+
+  const isTitheDonation = (transaction: PaymentTransaction) => {
+    const purpose = normalizePurpose(transaction.purpose);
+    return transaction.type === "donation" && (purpose === "tithe" || purpose.includes("tithe"));
+  };
+
+  const isOfferingDonation = (transaction: PaymentTransaction) => {
+    const purpose = normalizePurpose(transaction.purpose);
+    return transaction.type === "donation" && (purpose === "offering" || purpose === "offertory" || purpose.includes("offering") || purpose.includes("offertory"));
+  };
+
   const totTithe = useMemo(
-    () => completedTransactions
-      .filter((transaction) => transaction.type === "donation" && transaction.purpose.toLowerCase() === "tithe")
-      .reduce((sum, transaction) => sum + transaction.amount, 0),
+    () => completedTransactions.filter(isTitheDonation).reduce((sum, transaction) => sum + transaction.amount, 0),
     [completedTransactions]
   );
 
   const totOffertory = useMemo(
-    () => completedTransactions
-      .filter((transaction) => transaction.type === "donation" && transaction.purpose.toLowerCase() === "offertory")
-      .reduce((sum, transaction) => sum + transaction.amount, 0),
+    () => completedTransactions.filter(isOfferingDonation).reduce((sum, transaction) => sum + transaction.amount, 0),
     [completedTransactions]
   );
 
@@ -447,7 +456,7 @@ const PaymentsPage = () => {
       email: depositEmail,
       amount: Math.round(parseFloat(depositAmount) * 100),
       currency: "GHS",
-      ref: `txn_${Date.now()}`,
+      ref: `deposit_${Date.now()}`,
       metadata: {
         custom_fields: [
           { display_name: "Source", variable_name: "source", value: depositSource || "Admin Deposit" },
@@ -1019,7 +1028,7 @@ const PaymentsPage = () => {
           <p className="text-sm text-gray-500 dark:text-gray-400">No Covenant Seed members have been added yet.</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] border-collapse">
+            <table className="w-full min-w-180 border-collapse">
               <thead className="bg-gray-50 text-left text-xs uppercase tracking-wider text-gray-500 dark:bg-gray-800 dark:text-gray-300">
                 <tr>
                   <th className="px-4 py-3">Member</th>
@@ -1064,7 +1073,7 @@ const PaymentsPage = () => {
           <p className="text-sm text-gray-500 dark:text-gray-400">Loading transactions...</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px] border-collapse">
+            <table className="w-full min-w-225 border-collapse">
               <thead className="bg-gray-50 text-left text-xs uppercase tracking-wider text-gray-500 dark:bg-gray-800 dark:text-gray-300">
                 <tr>
                   <th className="px-4 py-3">Date</th>

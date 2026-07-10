@@ -130,7 +130,7 @@ const MinistriesPage = () => {
     <>
       <Breadcrumb pageName="Our Ministries" description="Growing together in faith and service" />
 
-      <section className="relative overflow-hidden bg-gradient-to-r from-primary/10 to-primary/5 py-14 md:py-20 lg:py-24 dark:from-primary/20 dark:to-primary/10">
+      <section className="relative overflow-hidden bg-linear-to-r from-primary/10 to-primary/5 py-14 md:py-20 lg:py-24 dark:from-primary/20 dark:to-primary/10">
         <div className="container relative z-10">
           <div className="max-w-3xl">
             <span className="mb-4 inline-flex rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
@@ -172,7 +172,7 @@ const MinistriesPage = () => {
             {ministries.map((ministry) => (
               <article
                 key={ministry.id}
-                className="group overflow-hidden rounded-[32px] bg-white shadow-[0_20px_60px_rgba(74,108,247,0.1)] transition-all duration-300 hover:-translate-y-2 dark:bg-gray-900"
+                className="group overflow-hidden rounded-4xl bg-white shadow-[0_20px_60px_rgba(74,108,247,0.1)] transition-all duration-300 hover:-translate-y-2 dark:bg-gray-900"
               >
                 <div className="relative h-64 md:h-80 lg:h-96 overflow-hidden">
                   <Image
@@ -181,7 +181,7 @@ const MinistriesPage = () => {
                     fill
                     className="object-cover transition duration-500 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/10 to-transparent" />
                   <div className="absolute left-6 bottom-6 inline-flex items-center gap-3 rounded-full bg-white/10 px-4 py-3 text-sm font-semibold text-white backdrop-blur-sm">
                     <span>{ministry.icon}</span>
                     <span>{ministry.title}</span>
@@ -243,7 +243,7 @@ const MinistriesPage = () => {
             ].map((value) => (
               <div
                 key={value.title}
-                className="rounded-[24px] border border-gray-200 bg-white p-8 text-center shadow-sm dark:border-gray-800 dark:bg-gray-900"
+                className="rounded-3xl border border-gray-200 bg-white p-8 text-center shadow-sm dark:border-gray-800 dark:bg-gray-900"
               >
                 <div className="mb-5 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-3xl">
                   {value.icon}
@@ -262,7 +262,7 @@ const MinistriesPage = () => {
 
       <section className="relative z-10 py-16 md:py-24 lg:py-28 bg-primary/5 dark:bg-primary/10">
         <div className="container">
-          <div className="rounded-[32px] bg-white p-10 shadow-xl dark:bg-gray-900 md:p-16">
+          <div className="rounded-4xl bg-white p-10 shadow-xl dark:bg-gray-900 md:p-16">
             <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
               <div>
                 <p className="mb-4 text-sm font-semibold uppercase tracking-[0.28em] text-primary">Ready to Serve</p>

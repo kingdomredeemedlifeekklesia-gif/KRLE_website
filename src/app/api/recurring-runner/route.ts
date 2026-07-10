@@ -1,8 +1,17 @@
 import { runRecurringCharges } from "@/lib/recurring";
 import { NextResponse } from "next/server";
+import { enforceRateLimit, isSameOriginRequest, forbiddenResponse, tooManyRequestsResponse } from "@/lib/request-security";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    if (!isSameOriginRequest(request)) {
+      return forbiddenResponse("Forbidden");
+    }
+
+    const rateLimit = enforceRateLimit(request, { limit: 10, windowMs: 60_000 });
+    if (!rateLimit.ok) {
+      return tooManyRequestsResponse("Too many requests");
+    }
     await runRecurringCharges();
     return NextResponse.json({ status: "ok" });
   } catch (error) {

@@ -27,21 +27,18 @@ const GalleryPage = () => {
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [previewFiles, setPreviewFiles] = useState<Array<{ name: string; url: string }>>([]);
 
-  const normalizeImageUrl = (url: string, filename: string) => {
-    if (url?.startsWith("/")) {
-      return url;
+  const normalizeImageUrl = (image: GalleryImage) => {
+    if (image.url?.startsWith("/") || image.url?.startsWith("http://") || image.url?.startsWith("https://")) {
+      return image.url;
     }
-    return url ? `/${url}` : `/uploads/gallery/${filename}`;
+    return image.id ? `/api/gallery/image/${image.id}` : "/gallery";
   };
 
   const getFallbackUrl = (image: GalleryImage) => {
-    if (image.url?.startsWith("/uploads/gallery/")) {
-      return image.url;
-    }
     if (image.url?.startsWith("/api/gallery/image/")) {
       return image.url;
     }
-    return image.id ? `/api/gallery/image/${image.id}` : `/uploads/gallery/${image.filename}`;
+    return image.id ? `/api/gallery/image/${image.id}` : normalizeImageUrl(image);
   };
 
   useEffect(() => {
@@ -65,7 +62,7 @@ const GalleryPage = () => {
       const data: GalleryImage[] = await response.json();
       setImages(data.map((image) => ({
         ...image,
-        url: normalizeImageUrl(image.url, image.filename),
+        url: normalizeImageUrl(image),
       })));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to load gallery images.");
@@ -159,6 +156,32 @@ const GalleryPage = () => {
     }
   };
 
+  const handleDeleteSelected = async () => {
+    if (selectedImages.size === 0) {
+      alert("Please select images to delete.");
+      return;
+    }
+
+    if (!confirm(`Delete ${selectedImages.size} selected image(s)?`)) return;
+
+    try {
+      const response = await fetch("/api/gallery", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: Array.from(selectedImages) }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete selected images.");
+      }
+
+      setSelectedImages(new Set());
+      await fetchImages();
+    } catch (err) {
+      setError("Failed to delete selected images.");
+    }
+  };
+
   const handleSelectImage = (id: string) => {
     const newSelected = new Set(selectedImages);
     if (newSelected.has(id)) {
@@ -209,7 +232,7 @@ const GalleryPage = () => {
 
   const handleDownloadSingle = async (image: GalleryImage) => {
     const link = document.createElement("a");
-    link.href = getFallbackUrl(image);
+    link.href = `/api/gallery/download?id=${encodeURIComponent(image.id)}`;
     link.download = image.filename;
     link.click();
   };
@@ -330,12 +353,20 @@ const GalleryPage = () => {
             Select All
           </label>
           {selectedImages.size > 0 && (
-            <button
-              onClick={handleDownloadSelected}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Download Selected ({selectedImages.size})
-            </button>
+            <>
+              <button
+                onClick={handleDownloadSelected}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Download Selected ({selectedImages.size})
+              </button>
+              <button
+                onClick={handleDeleteSelected}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Delete Selected ({selectedImages.size})
+              </button>
+            </>
           )}
         </div>
       )}
@@ -367,11 +398,11 @@ const GalleryPage = () => {
                     className="absolute top-2 left-2 z-10"
                   />
                   <img
-                    src={normalizeImageUrl(image.url, image.filename)}
+                    src={normalizeImageUrl(image)}
                     alt={image.title}
                     className="w-full h-48 object-cover"
                     onError={(e) => {
-                      console.error(`Failed to load image: ${normalizeImageUrl(image.url, image.filename)}`);
+                      console.error(`Failed to load image: ${normalizeImageUrl(image)}`);
                     }}
                   />
                 </div>

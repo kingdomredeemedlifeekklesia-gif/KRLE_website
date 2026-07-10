@@ -16,11 +16,8 @@ const Sermon = ({ limit = 3 }: SermonSectionProps) => {
   useEffect(() => {
     async function fetchVideos() {
       try {
-        const videos = await getYouTubeVideos(Math.max(limit, 10));
-        // Prefer live streams, otherwise latest videos
-        const liveVideos = videos.filter((v) => v.isLive).slice(0, limit);
-        const chosen = liveVideos.length > 0 ? liveVideos : videos.slice(0, limit);
-        setYoutubeVideos(chosen.slice(0, limit));
+        const videos = await getYouTubeVideos(limit);
+        setYoutubeVideos(videos);
       } catch (err) {
         console.error("Failed to fetch YouTube videos:", err);
         setError("No sermons available at the moment.");
@@ -37,7 +34,7 @@ const Sermon = ({ limit = 3 }: SermonSectionProps) => {
       <div className="container">
         <SectionTitle
           title="Latest Sermon Streams"
-          paragraph="Watch the latest 3 sermon streams from our YouTube channel, with additional uploaded videos available on the sermon page."
+          paragraph="Watch the latest 3 sermon videos from our YouTube channel."
           center
         />
 
@@ -57,7 +54,7 @@ const Sermon = ({ limit = 3 }: SermonSectionProps) => {
           <div className="text-center py-8">Loading latest sermons...</div>
         )}
         {loaded && youtubeVideos.length === 0 && (
-          <div className="text-center py-8">{error ?? "No sermons available at the moment."}</div>
+          <div className="text-center py-8">{error ?? "No sermons available"}</div>
         )}
       </div>
     </section>

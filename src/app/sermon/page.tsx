@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const isYouTubeConfigured = Boolean(process.env.NEXT_PUBLIC_YOUTUBE_API_KEY && process.env.NEXT_PUBLIC_YOUTUBE_CHANNEL_ID);
 
 const Blog = async () => {
-  const videos = isYouTubeConfigured ? await getYouTubeVideos(50) : [];
+  const videos = isYouTubeConfigured ? await getYouTubeVideos() : [];
 
   return (
     <>
@@ -21,7 +21,7 @@ const Blog = async () => {
         description="Discover uplifting messages, daily devotions, and spiritual encouragement from our pastors and ministry leaders."
       />
 
-      <section className="pt-[100px] pb-[100px]">
+      <section className="pt-25 pb-25">
         <div className="container">
           <SectionTitle
             title="All Sermons & Streams"

@@ -1,9 +1,19 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { runRecurringCharges } from "@/lib/recurring";
+import { enforceRateLimit, forbiddenResponse, isSameOriginRequest, tooManyRequestsResponse } from "@/lib/request-security";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    if (!isSameOriginRequest(request)) {
+      return forbiddenResponse("Forbidden");
+    }
+
+    const rateLimit = enforceRateLimit(request, { limit: 20, windowMs: 60_000 });
+    if (!rateLimit.ok) {
+      return tooManyRequestsResponse("Too many requests");
+    }
+
     const subscriptions = await prisma.recurringSubscription.findMany({
       orderBy: { nextChargeAt: "asc" },
     });
@@ -21,8 +31,17 @@ export async function GET() {
   }
 }
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
+    if (!isSameOriginRequest(request)) {
+      return forbiddenResponse("Forbidden");
+    }
+
+    const rateLimit = enforceRateLimit(request, { limit: 10, windowMs: 60_000 });
+    if (!rateLimit.ok) {
+      return tooManyRequestsResponse("Too many requests");
+    }
+
     const results = await runRecurringCharges();
     return NextResponse.json({ success: true, results });
   } catch (error) {

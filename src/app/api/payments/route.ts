@@ -9,7 +9,13 @@ export async function GET() {
     return NextResponse.json(transactions);
   } catch (error) {
     console.error("Payments GET error:", error);
-    return NextResponse.json({ error: "Failed to load payment transactions." }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: "Failed to load payment transactions.",
+        details: error instanceof Error ? error.message : "Unknown database error",
+      },
+      { status: 500 }
+    );
   }
 }
 
@@ -21,6 +27,7 @@ export async function POST(request: Request) {
       email,
       amount,
       currency = "GHS",
+      reference,
       purpose,
       type,
       status = "Completed",
@@ -42,6 +49,7 @@ export async function POST(request: Request) {
         email: email || null,
         amount: Number(amount),
         currency,
+        reference: reference || null,
         purpose,
         type,
         status,
@@ -54,6 +62,12 @@ export async function POST(request: Request) {
     return NextResponse.json(transaction, { status: 201 });
   } catch (error) {
     console.error("Payments POST error:", error);
-    return NextResponse.json({ error: "Failed to save payment transaction." }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: "Failed to save payment transaction.",
+        details: error instanceof Error ? error.message : "Unknown database error",
+      },
+      { status: 500 }
+    );
   }
 }

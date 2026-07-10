@@ -10,7 +10,7 @@ async function testDB() {
       data: {
         title: 'Test Image',
         filename: 'test.jpg',
-        url: '/uploads/gallery/test.jpg',
+        url: 'https://ecmpgekgclieyswbdwyw.supabase.co/storage/v1/object/public/gallery/test.jpg',
         category: 'test',
       },
     });

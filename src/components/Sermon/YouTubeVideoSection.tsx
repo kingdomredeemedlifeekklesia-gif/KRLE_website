@@ -23,7 +23,7 @@ export default function YouTubeVideoSection() {
 
     const fetchVideos = async () => {
       try {
-        const videos = await getYouTubeVideos(3);
+        const videos = await getYouTubeVideos();
         setYoutubeVideos(videos.slice(0, 3));
       } catch (error) {
         console.error("YouTube fetch failed:", error);

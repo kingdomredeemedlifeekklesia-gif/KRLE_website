@@ -6,15 +6,16 @@ const AboutHostPastor = () => {
       <div className="container">
         <div className="-mx-4 flex flex-wrap items-center">
           <div className="w-full px-4 lg:w-1/2">
-            <div className="mx-auto mb-12 w-full max-w-[500px] lg:m-0">
-              <div className="relative w-full overflow-hidden rounded-[40px] bg-white shadow-three min-h-[320px]">
-                <div className="relative aspect-[4/3] w-full">
+            <div className="mx-auto mb-12 w-full max-w-125 lg:m-0">
+              <div className="relative w-full overflow-hidden rounded-[40px] bg-white shadow-three">
+                <div className="relative aspect-4/5 w-full sm:aspect-4/3 lg:aspect-4/5">
                   <Image
                     src="/images/about/IMG_0951img_0951.jpg"
                     alt="host pastor"
                     fill
                     sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 500px"
                     className="object-cover object-center transition duration-500 dark:hidden"
+                    priority
                   />
                   <Image
                     src="/images/about/IMG_0951img_0951.jpg"
@@ -22,13 +23,14 @@ const AboutHostPastor = () => {
                     fill
                     sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 500px"
                     className="hidden object-cover object-center transition duration-500 dark:block"
+                    priority
                   />
                 </div>
               </div>
             </div>
           </div>
           <div className="w-full px-4 lg:w-1/2">
-            <div className="max-w-[470px]">
+            <div className="max-w-117.5">
               <div className="mb-9">
                 <h2 className="mb-4 text-3xl font-bold text-black dark:text-white sm:text-4xl lg:text-3xl xl:text-4xl">
                   Meet Our Host Pastor

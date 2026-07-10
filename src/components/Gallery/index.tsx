@@ -60,10 +60,7 @@ const Gallery = () => {
         throw new Error("Failed to load gallery images.");
       }
       const data: GalleryImage[] = await response.json();
-      setImages(data.map((img) => ({
-        ...img,
-        url: img.url.startsWith("/") ? img.url : `/${img.url}`,
-      })));
+      setImages(data);
     } catch (err) {
       console.error("Failed to load images:", err);
       setError(err instanceof Error ? err.message : "Unable to load gallery images.");
@@ -72,21 +69,18 @@ const Gallery = () => {
     }
   };
 
-  const getImageUrl = (url: string, filename: string) => {
-    if (url?.startsWith("/")) {
-      return url;
+  const getImageUrl = (image: GalleryImage) => {
+    if (image.url?.startsWith("/") || image.url?.startsWith("http://") || image.url?.startsWith("https://")) {
+      return image.url;
     }
-    return url ? `/${url}` : `/uploads/gallery/${filename}`;
+    return image.id ? `/api/gallery/image/${image.id}` : "/gallery";
   };
 
   const getFallbackUrl = (image: GalleryImage) => {
-    if (image.url?.startsWith("/uploads/gallery/")) {
-      return image.url;
-    }
     if (image.url?.startsWith("/api/gallery/image/")) {
       return image.url;
     }
-    return image.id ? `/api/gallery/image/${image.id}` : `/uploads/gallery/${image.filename}`;
+    return image.id ? `/api/gallery/image/${image.id}` : getImageUrl(image);
   };
 
   const filteredImages = selectedCategory === "all"
@@ -137,7 +131,7 @@ const Gallery = () => {
 
   const handleDownloadSingle = (image: GalleryImage) => {
     const link = document.createElement("a");
-    link.href = image.url;
+    link.href = `/api/gallery/download?id=${encodeURIComponent(image.id)}`;
     link.download = image.filename;
     link.click();
   };
@@ -225,12 +219,12 @@ const Gallery = () => {
                   aria-label={`View ${image.title}`}
                 >
                   <Image
-                    src={getImageUrl(image.url, image.filename)}
+                    src={getImageUrl(image)}
                     alt={image.title}
                     fill
                     unoptimized
                     sizes="100vw"
-                    className="object-cover transition-transform duration-300"
+                    className="object-cover object-center transition-transform duration-300"
                     onError={(event) => {
                       const target = event.target as HTMLImageElement;
                       target.src = getFallbackUrl(image);
@@ -287,7 +281,7 @@ const Gallery = () => {
               </button>
               <div className="relative rounded-lg bg-black p-4">
                 <Image
-                    src={getImageUrl(lightboxImage.url, lightboxImage.filename)}
+                    src={getImageUrl(lightboxImage)}
                   alt={lightboxImage.title}
                   width={800}
                   height={600}

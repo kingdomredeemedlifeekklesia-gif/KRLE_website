@@ -3,13 +3,22 @@ import Image from "next/image";
 import Link from "next/link";
 
 const Footer = () => {
+  const socialLinks = {
+    facebook: process.env.NEXT_PUBLIC_FACEBOOK_URL || "/",
+    x: process.env.NEXT_PUBLIC_X_URL || "/",
+    youtube: process.env.NEXT_PUBLIC_YOUTUBE_URL || "/",
+    linkedin: process.env.NEXT_PUBLIC_LINKEDIN_URL || "/",
+    instagram: process.env.NEXT_PUBLIC_INSTAGRAM_URL || "/",
+    tiktok: process.env.NEXT_PUBLIC_TIKTOK_URL || "/",
+  };
+
   return (
     <>
       <footer className="relative z-10 bg-white pt-16 dark:bg-gray-dark md:pt-20 lg:pt-24">
         <div className="container">
           <div className="-mx-4 flex flex-wrap">
             <div className="w-full px-4 md:w-1/2 lg:w-4/12 xl:w-5/12">
-              <div className="mb-12 max-w-[360px] lg:mb-16">
+              <div className="mb-12 max-w-90 lg:mb-16">
                 <Link href="/" className="mb-8 inline-block">
                   <Image
                     src="/images/logo/1.png"
@@ -24,7 +33,7 @@ const Footer = () => {
                 </p>
                 <div className="flex items-center">
                   <a
-                    href="/"
+                    href={socialLinks.facebook}
                     aria-label="social-link"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -45,7 +54,7 @@ const Footer = () => {
                   </a>
                   {/* Instagram */}
                   <a
-                    href={process.env.NEXT_PUBLIC_INSTAGRAM_URL || "/"}
+                    href={socialLinks.instagram}
                     aria-label="instagram-link"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -59,7 +68,7 @@ const Footer = () => {
                   </a>
                   {/* TikTok */}
                   <a
-                    href={process.env.NEXT_PUBLIC_TIKTOK_URL || "/"}
+                    href={socialLinks.tiktok}
                     aria-label="tiktok-link"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -70,7 +79,7 @@ const Footer = () => {
                     </svg>
                   </a>
                   <a
-                    href="/"
+                    href={socialLinks.x}
                     aria-label="social-link"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -92,7 +101,7 @@ const Footer = () => {
                     </svg>
                   </a>
                   <a
-                    href="/"
+                    href={socialLinks.youtube}
                     aria-label="social-link"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -108,7 +117,7 @@ const Footer = () => {
                     </svg>
                   </a>
                   <a
-                    href="/"
+                    href={socialLinks.linkedin}
                     aria-label="social-link"
                     target="_blank"
                     rel="noopener noreferrer"

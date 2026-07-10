@@ -10,38 +10,38 @@ export interface YouTubeVideo {
   isLive: boolean;
 }
 
-export async function getYouTubeVideos(limit: number = 10): Promise<YouTubeVideo[]> {
+export async function getYouTubeVideos(limit?: number): Promise<YouTubeVideo[]> {
   if (!YOUTUBE_API_KEY || !YOUTUBE_CHANNEL_ID) {
     return [];
   }
 
-  const fetchOptions: any = typeof window === "undefined" ? { next: { revalidate: 60 } } : {};
+  const params = new URLSearchParams({
+    part: "snippet",
+    channelId: YOUTUBE_CHANNEL_ID,
+    order: "date",
+    maxResults: limit ? String(limit) : "12",
+    type: "video",
+    key: YOUTUBE_API_KEY,
+  });
 
   try {
-    const response = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${YOUTUBE_CHANNEL_ID}&order=date&maxResults=${limit}&type=video&key=${YOUTUBE_API_KEY}`,
-      fetchOptions
-    );
+    const response = await fetch(`https://www.googleapis.com/youtube/v3/search?${params.toString()}`, {
+      next: { revalidate: 300 },
+    });
     const data = await response.json();
 
-    if (!response.ok) {
+    if (!response.ok || !Array.isArray(data.items)) {
       console.error("YouTube API error:", data);
       return [];
     }
 
-    if (!data.items) {
-      console.error("YouTube API returned no items", data);
-      return [];
-    }
-
-    return data.items.map((item: any) => ({
+    const items = Array.isArray(data.items) ? data.items : [];
+    return items.slice(0, limit ?? items.length).map((item: any) => ({
       id: item.id.videoId,
       title: item.snippet.title,
       description: item.snippet.description,
-      thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url,
+      thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url,
       publishedAt: item.snippet.publishedAt,
-      // YouTube provides `liveBroadcastContent` as 'none' | 'upcoming' | 'live'
-      // treat 'live' and 'upcoming' as live-related content for filtering
       isLive: (item.snippet?.liveBroadcastContent || "none") !== "none",
     }));
   } catch (error) {
@@ -51,32 +51,6 @@ export async function getYouTubeVideos(limit: number = 10): Promise<YouTubeVideo
 }
 
 export async function getRecentLiveStream(): Promise<YouTubeVideo | null> {
-  if (!YOUTUBE_API_KEY || !YOUTUBE_CHANNEL_ID) {
-    return null;
-  }
-
-  const fetchOptions: any = typeof window === "undefined" ? { next: { revalidate: 60 } } : {};
-
-  try {
-    const response = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${YOUTUBE_CHANNEL_ID}&eventType=live&type=video&key=${YOUTUBE_API_KEY}`,
-      fetchOptions
-    );
-    const data = await response.json();
-
-    if (!data.items || data.items.length === 0) return null;
-
-    const item = data.items[0];
-    return {
-      id: item.id.videoId,
-      title: item.snippet.title,
-      description: item.snippet.description,
-      thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url,
-      publishedAt: item.snippet.publishedAt,
-      isLive: true,
-    };
-  } catch (error) {
-    console.error("Error fetching live stream:", error);
-    return null;
-  }
+  const videos = await getYouTubeVideos(1);
+  return videos[0] ?? null;
 }

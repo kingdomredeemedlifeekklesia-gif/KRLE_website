@@ -1,0 +1,89 @@
+{
+  "ContactMessage": [
+    {
+      "id": "3b6f4f58-7f3f-4908-8875-d80a4ec700c1",
+      "name": "Supabase Test",
+      "email": "test@example.com",
+      "whatsapp": "+233555000000",
+      "message": "Health check from automation",
+      "status": "unread",
+      "createdAt": "2026-07-10T12:39:48.998Z"
+    },
+    {
+      "id": "ceff5f8d-0d87-48da-95f2-a5c23d93ce20",
+      "name": "Samuel",
+      "email": "gogovisamuel622@gmail.com",
+      "whatsapp": "0240382713",
+      "message": "good boy",
+      "status": "replied",
+      "createdAt": "2026-07-10T14:12:21.891Z",
+      "updatedAt": "2026-07-10T14:13:28.354Z",
+      "adminReply": "ok"
+    },
+    {
+      "id": "6632427c-086c-4602-b889-045af92bc8f5",
+      "name": "Test User",
+      "email": "test@example.com",
+      "whatsapp": "+233241000000",
+      "message": "Smoke test",
+      "status": "unread",
+      "createdAt": "2026-07-10T14:15:08.867Z"
+    }
+  ],
+  "PaymentTransaction": [
+    {
+      "id": "f2220972-cf4e-4d5b-ab1e-fe78a569a011",
+      "donor": null,
+      "email": null,
+      "amount": 0,
+      "currency": "GHS",
+      "reference": "test_ref_123",
+      "purpose": "Donation",
+      "type": "donation",
+      "status": "Failed",
+      "provider": "Paystack",
+      "note": "Paystack verification failed - test_ref_123",
+      "details": "Reference: test_ref_123; Gateway: Paystack; Recurring: One-time",
+      "createdAt": "2026-07-10T12:49:30.968Z",
+      "updatedAt": "2026-07-10T14:15:09.713Z"
+    }
+  ],
+  "GalleryImage": [
+    {
+      "id": "191554c7-6394-406e-983d-380098a12f8c",
+      "title": "the",
+      "description": null,
+      "filename": "1783688118179-278507b0-b3a4-410a-8f2c-53ec7a055421-01.png",
+      "url": "https://ecmpgekgclieyswbdwyw.supabase.co/storage/v1/object/public/church-gallery/1783688118179-278507b0-b3a4-410a-8f2c-53ec7a055421-01.png",
+      "category": "services",
+      "uploadedAt": "2026-07-10T12:55:24.388Z"
+    },
+    {
+      "id": "67f1a89f-ee1d-48ac-acc5-89addf1dc16c",
+      "title": "ghd",
+      "description": null,
+      "filename": "1783692874369-595c83ed-c3ca-4ac0-9ad0-99dd8f39a581-buhlebully-x-africanunkown-stories-removebg-preview.png",
+      "url": "https://ecmpgekgclieyswbdwyw.supabase.co/storage/v1/object/public/church-gallery/1783692874369-595c83ed-c3ca-4ac0-9ad0-99dd8f39a581-buhlebully-x-africanunkown-stories-removebg-preview.png",
+      "category": "programs",
+      "uploadedAt": "2026-07-10T14:14:35.495Z"
+    }
+  ],
+  "CommunityMember": [
+    {
+      "id": "02e00578-2592-4933-b7bb-23f777f678c3",
+      "name": "Gogovi samuel",
+      "whatsappNumber": "0247898712",
+      "createdAt": "2026-07-10T14:12:17.198Z",
+      "updatedAt": "2026-07-10T14:12:17.198Z",
+      "joinedAt": "2026-07-10T14:12:17.198Z"
+    },
+    {
+      "id": "908c68b3-07a0-4626-b99d-44abcfb1fe5d",
+      "name": "Test Member",
+      "whatsappNumber": "+233241000000",
+      "createdAt": "2026-07-10T14:15:08.968Z",
+      "updatedAt": "2026-07-10T14:15:08.968Z",
+      "joinedAt": "2026-07-10T14:15:08.968Z"
+    }
+  ]
+}

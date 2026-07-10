@@ -7,15 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model UploadedVideo {
-  id          String   @id @default(cuid())
-  title       String
-  description String
-  filename    String
-  url         String
-  uploadedAt  DateTime @default(now())
-}
-
 model ContactMessage {
   id         String   @id @default(cuid())
   name       String
@@ -43,7 +34,6 @@ model GalleryImage {
   filename    String
   url         String
   category    String
-  imageBlob   Bytes?
   uploadedAt  DateTime @default(now())
 }
 
@@ -53,6 +43,7 @@ model PaymentTransaction {
   email     String?
   amount    Float
   currency  String   @default("GHS")
+  reference String?  @unique
   purpose   String
   type      String
   status    String   @default("Completed")

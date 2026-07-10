@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const DonationForm = () => {
   const [amount, setAmount] = useState("");
@@ -13,6 +13,7 @@ const DonationForm = () => {
   const [recurring, setRecurring] = useState(false);
   const [paystackLoaded, setPaystackLoaded] = useState(false);
   const [paystackLoading, setPaystackLoading] = useState(true);
+  const paystackTimeoutRef = useRef<number | null>(null);
   const covenantSeedAmounts = [100, 500, 1000];
 
   const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || "";
@@ -34,12 +35,20 @@ const DonationForm = () => {
     return digits;
   };
 
+  const finishPaystackLoad = (loaded: boolean) => {
+    if (paystackTimeoutRef.current) {
+      window.clearTimeout(paystackTimeoutRef.current);
+      paystackTimeoutRef.current = null;
+    }
+    setPaystackLoaded(loaded);
+    setPaystackLoading(false);
+  };
+
   const loadPaystackScript = () => {
     if (typeof window === "undefined") return;
 
     if ((window as any).PaystackPop) {
-      setPaystackLoaded(true);
-      setPaystackLoading(false);
+      finishPaystackLoad(true);
       return;
     }
 
@@ -48,19 +57,16 @@ const DonationForm = () => {
       const scriptReadyState = (existingScript as any).readyState;
       if (scriptReadyState === "complete" || scriptReadyState === "loaded") {
         if ((window as any).PaystackPop) {
-          setPaystackLoaded(true);
-          setPaystackLoading(false);
+          finishPaystackLoad(true);
           return;
         }
       }
 
       existingScript.addEventListener("load", () => {
-        setPaystackLoaded(true);
-        setPaystackLoading(false);
+        finishPaystackLoad(Boolean((window as any).PaystackPop));
       });
       existingScript.addEventListener("error", () => {
-        setPaystackLoaded(false);
-        setPaystackLoading(false);
+        finishPaystackLoad(false);
       });
       return;
     }
@@ -69,19 +75,28 @@ const DonationForm = () => {
     script.src = "https://js.paystack.co/v1/inline.js";
     script.async = true;
     script.onload = () => {
-      setPaystackLoaded(true);
-      setPaystackLoading(false);
+      finishPaystackLoad(Boolean((window as any).PaystackPop));
       script.setAttribute("data-loaded", "true");
     };
     script.onerror = () => {
-      setPaystackLoaded(false);
-      setPaystackLoading(false);
+      finishPaystackLoad(false);
     };
     document.body.appendChild(script);
+
+    paystackTimeoutRef.current = window.setTimeout(() => {
+      if (!paystackLoaded) {
+        finishPaystackLoad(false);
+      }
+    }, 8000);
   };
 
   useEffect(() => {
     loadPaystackScript();
+    return () => {
+      if (paystackTimeoutRef.current) {
+        window.clearTimeout(paystackTimeoutRef.current);
+      }
+    };
   }, []);
 
   const handlePayment = () => {
@@ -89,6 +104,7 @@ const DonationForm = () => {
     setPaymentError(null);
 
     if (isKeyMissing) {
+      setPaystackLoading(false);
       setPaymentError(
         "Paystack public key is not configured. Please set NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY in .env.local."
       );
@@ -115,6 +131,48 @@ const DonationForm = () => {
     }
 
     const normalizedPhone = formatPhoneForPaystack(phone);
+    const paystackCallback = (response: any) => {
+      void (async () => {
+        try {
+          const verifyResponse = await fetch('/api/paystack/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              reference: response.reference,
+              devData: {
+                name,
+                email,
+                amount: Math.round(parseFloat(amount) * 100) / 100,
+                currency: 'GHS',
+                paymentMethod,
+              },
+            }),
+          });
+
+          const result = await verifyResponse.json().catch(() => null);
+
+          if (!verifyResponse.ok || !result?.success) {
+            console.error('Verification result:', result);
+            setPaymentError(result?.message || 'Payment verification failed. Please contact support.');
+            setPaymentStatus(null);
+            return;
+          }
+
+          setPaymentStatus(result.message || 'Payment Successful');
+          setPaymentError(null);
+          try {
+            await fetch('/api/admin/refresh-payments', { method: 'POST' });
+          } catch (e) {
+            console.warn('Refresh payments failed:', e);
+          }
+        } catch (error) {
+          console.error('Verification error:', error);
+          setPaymentError('Payment verification failed. Please contact support.');
+          setPaymentStatus(null);
+        }
+      })();
+    };
+
     const paymentConfig: any = {
       key: publicKey,
       email,
@@ -145,50 +203,7 @@ const DonationForm = () => {
           },
         ],
       },
-      callback: async (response: any) => {
-        try {
-          const verifyResponse = await fetch('/api/paystack/verify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              reference: response.reference,
-              devData: {
-                name,
-                email,
-                amount: Math.round(parseFloat(amount) * 100) / 100,
-                currency: 'GHS',
-                paymentMethod,
-              },
-            }),
-          });
-
-          if (!verifyResponse.ok) {
-            const text = await verifyResponse.text();
-            console.error('Verify non-OK response:', verifyResponse.status, text);
-            setPaymentError('Payment verification failed. Please contact support.');
-            return;
-          }
-
-          const result = await verifyResponse.json();
-          if (result && result.success) {
-            setPaymentStatus('Payment completed successfully.');
-            // Optionally include reference in console for debugging
-            console.info('Payment verified:', response.reference);
-            // Notify admin UI: attempt to post a small event to refresh admin (best-effort)
-            try {
-              await fetch('/api/admin/refresh-payments', { method: 'POST' });
-            } catch (e) {
-              // ignore; admin page will pick up new record on next load
-            }
-          } else {
-            console.error('Verification result:', result);
-            setPaymentError('Payment verification failed. Please contact support.');
-          }
-        } catch (error) {
-          console.error('Verification error:', error);
-          setPaymentError('Payment verification failed. Please contact support.');
-        }
-      },
+      callback: paystackCallback,
       onClose: () => {
         setPaymentError("Payment cancelled.");
       },
