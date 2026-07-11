@@ -1,11 +1,10 @@
-import { defineRailway, project, service } from "../node_modules/railway/dist/index.js";
+import { defineRailway, project, service } from "railway";
 
 export default defineRailway(() => {
   const web = service("KRLE_website", {
     build: "npm run build",
     start: "npm run start",
     deploy: {
-      // Remove automatic pre-deploy commands (e.g. prisma db push)
       preDeployCommand: [],
     },
   });
