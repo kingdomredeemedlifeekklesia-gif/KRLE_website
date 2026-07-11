@@ -1,0 +1,11 @@
+node_modules
+.next
+.env
+.env.local
+.env.*
+.git
+uploads
+public/uploads
+coverage
+logs
+railway-logs.json
