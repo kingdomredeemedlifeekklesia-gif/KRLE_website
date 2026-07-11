@@ -1,4 +1,4 @@
-import { defineRailway, project, service } from "railway";
+import { defineRailway, project, service } from "railway/iac";
 
 export default defineRailway(() => {
   const web = service("KRLE_website", {
